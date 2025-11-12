@@ -4,20 +4,26 @@ from src.generator import generate_dialogues
 from src.output_writer import save_output
 import os
 
-@task(retries=1,result_serializer="json")
-def process_document(file_path: str):
-    text = extract_text(file_path)
-    dialogues = generate_dialogues(text)
-    output_path = save_output(file_path, dialogues)
+@task(retries=1, result_serializer="json")
+def extract_all_texts(file_paths):
+    texts = []
+    for file_path in file_paths:
+        text = extract_text(file_path)
+        texts.append(text)
+    return "\n".join(texts)
+
+@task(result_serializer="json")
+def generate_and_save_dialogues(all_text, output_path="outputs/combined_dialogues.json"):
+    dialogues = generate_dialogues(all_text)
+    save_output(output_path, dialogues)
     return output_path
 
 @flow(name="Arabic Dialogue Corpus Generation")
 def dialogue_flow(input_dir: str = "sample_docs"):
-    files = [os.path.join(input_dir, f) for f in os.listdir(input_dir)]
-    results = []
-    for f in files:
-        results.append(process_document.submit(f))
-    return results
+    files = [os.path.join(input_dir, f) for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, f))]
+    all_text = extract_all_texts(files)
+    result = generate_and_save_dialogues(all_text)
+    return result
 
 if __name__ == "__main__":
     dialogue_flow()
