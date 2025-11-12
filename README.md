@@ -26,6 +26,9 @@ NEXT.js: https://github.com/iheboueslati909/aralects-assessment-next-js
 
 ---
 
+![image.png](https://ibb.co/yB0Ppbn5)
+![image2.png](https://ibb.co/hRdMYSZ5)
+
 ## 🧰 Dependencies
 
 Install required dependencies:
@@ -37,5 +40,3 @@ pip install google-generativeai
 pip install -U prefect prefect-cloud
 pip install python-dotenv
 
-![image.png](https://ibb.co/yB0Ppbn5)
-![image.png](https://ibb.co/hRdMYSZ5)
