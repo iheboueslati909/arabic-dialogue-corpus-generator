@@ -6,7 +6,7 @@ def save_output(file_path: str, dialogues: str):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     
     basename = os.path.basename(file_path).split(".")[0]
-    filename = f"{timestamp}_{basename}_dialogues.json"
+    filename = f"{timestamp}_{basename}.json"
     
     output_dir = "outputs"
     os.makedirs(output_dir, exist_ok=True)
