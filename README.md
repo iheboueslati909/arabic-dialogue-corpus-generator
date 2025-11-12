@@ -25,9 +25,9 @@ NEXT.js: https://github.com/iheboueslati909/aralects-assessment-next-js
 - 🌐 Optional **FastAPI + Next.js** integration for full-stack use  
 
 ---
+![ezcv logo](https://raw.githubusercontent.com/iheboueslati909/arabic-dialogue-corpus-generator/refs/heads/main/ss1.png)
+![ezcv logo](https://raw.githubusercontent.com/iheboueslati909/arabic-dialogue-corpus-generator/refs/heads/main/ss2.png)
 
-![image.png](https://ibb.co/yB0Ppbn5)
-![image2.png](https://ibb.co/hRdMYSZ5)
 
 ## 🧰 Dependencies
 
