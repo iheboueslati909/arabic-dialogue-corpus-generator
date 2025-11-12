@@ -23,7 +23,7 @@ def call_llm(prompt: str, retries: int = 3, backoff: float = 2.0):
             response = model.generate_content(prompt)
             return response.text
         except requests.exceptions.HTTPError as e:
-            if e.response.status_code == 429:  # Rate limit hit
+            if e.response.status_code == 429:
                 wait_time = backoff ** attempt
                 print(f"Rate limit hit. Retrying in {wait_time:.1f}s...")
                 time.sleep(wait_time)
