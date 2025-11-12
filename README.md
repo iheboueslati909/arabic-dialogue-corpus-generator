@@ -37,5 +37,5 @@ pip install google-generativeai
 pip install -U prefect prefect-cloud
 pip install python-dotenv
 
-![image.png](attachment:bf967a94-5632-4da6-bf68-9e5be29c8434:image.png)
-![image.png](attachment:d9d68a9c-29ac-4b5a-80b7-1e3dcb3aae0c:image.png)
+![image.png](https://img.notionusercontent.com/s3/prod-files-secure%2F3e4b640f-2995-4b04-b406-2a714cac3861%2Fbf967a94-5632-4da6-bf68-9e5be29c8434%2Fimage.png/size/w=2000?exp=1762989345&sig=5P4C3RvirXCTHxBaZq9Mb4Q3yuEMy0q-aLyx_HmASIQ&id=2a94de3b-4d14-8059-acfb-c736ad14bd98&table=block&userId=d5f814cb-539c-418a-822c-ca3f3f304fa2)
+![image.png](https://img.notionusercontent.com/s3/prod-files-secure%2F3e4b640f-2995-4b04-b406-2a714cac3861%2Fd9d68a9c-29ac-4b5a-80b7-1e3dcb3aae0c%2Fimage.png/size/w=2000?exp=1762989399&sig=XSOa19Hzvs-D296U9y3PCGLwWQ8TzmhvaBPb0zFokRQ&id=2a94de3b-4d14-80e1-9ced-cc660c1f690e&table=block&userId=d5f814cb-539c-418a-822c-ca3f3f304fa2)
