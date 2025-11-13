@@ -1,10 +1,8 @@
 import os
 from prefect import flow, task
-from src.extractor import extract_text
-from src.generator import generate_dialogues
-from src.output_writer import save_output
+from utils.extractor import extract_text
+from utils.generator import generate_dialogues
 import json
-import os
 from datetime import datetime
 
 @task(retries=1, result_serializer="json")
