@@ -1,9 +1,9 @@
 import os
-from prefect import flow, task
-from utils.extractor import extract_text
-from utils.generator import generate_dialogues
 import json
 from datetime import datetime
+from prefect import flow, task
+from .utils.extractor import extract_text
+from .utils.generator import generate_dialogues
 
 @task(retries=1, result_serializer="json")
 def extract_all_texts(file_paths):
@@ -14,14 +14,12 @@ def extract_all_texts(file_paths):
     return "\n---DOC BREAK---\n".join(texts)
 
 @task(result_serializer="json")
-def generate_and_save_dialogues(all_text, output_path="outputs/generated_dialogues.json"):
+def generate_and_save_dialogues(all_text, output_dir="./data/outputs"):
     dialogues = generate_dialogues(all_text)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     
-    basename = os.path.basename("outputs/generated_dialogues.json").split(".")[0]
-    filename = f"{timestamp}_{basename}.json"
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"generated_dialogues_{timestamp}.json"
     
-    output_dir = "outputs"
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, filename)
 
@@ -31,8 +29,16 @@ def generate_and_save_dialogues(all_text, output_path="outputs/generated_dialogu
     return output_path
 
 @flow(name="Arabic Dialogue Corpus Generation")
-def dialogue_flow(input_dir: str = "sample_docs"):
-    files = [os.path.join(input_dir, f) for f in os.listdir(input_dir) if os.path.isfile(os.path.join(input_dir, f))]
+def dialogue_flow(input_dir: str = "./data/sample_docs"):
+    if not os.path.exists(input_dir):
+        raise ValueError(f"Input directory {input_dir} does not exist")
+    
+    files = [
+        os.path.join(input_dir, f) 
+        for f in os.listdir(input_dir) 
+        if os.path.isfile(os.path.join(input_dir, f))
+    ]
+    
     all_text = extract_all_texts(files)
     result = generate_and_save_dialogues(all_text)
     return result
