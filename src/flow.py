@@ -1,4 +1,5 @@
 import json
+import typer
 from datetime import datetime
 from typing import List, Dict, Any
 from prefect import flow, task
@@ -89,36 +90,46 @@ def validate_input_directory(input_dir: Path = INPUT_DIR) -> List[Path]:
 
 # -------------------- FLOW --------------------
 
+app = typer.Typer()
+
+@app.command()
+def run(
+    model: str = typer.Option(DEFAULT_LLM_MODEL, "--model", "-m")
+):
+    """
+    Run the Prefect flow from the CLI using Typer.
+    """
+    model = model.strip()
+    result = dialogue_flow(model_key=model)
+    typer.echo(f"[DONE] Output saved at: {result}")
+    
+    
 @flow(name="Arabic Dialogue Corpus Generation")
 def dialogue_flow(model_key: str = DEFAULT_LLM_MODEL, input_dir: Path = INPUT_DIR):
-    """
-    Main flow for Arabic Dialogue Corpus Generation.
-    
-    Args:
-        input_dir: Directory containing input documents
-        
-    Returns:
-        Path to the generated dialogues JSON file
-    """
-    # Validate input and get file list
+    # Validate input
     file_paths = validate_input_directory(input_dir)
     
-    # Extract text from each document individually (parallel)
+    # Extract text (parallel)
     extracted_texts = extract_single_document.map([str(p) for p in file_paths])
     
-    # Combine all extracted texts
+    # Combine texts
     combined_text = combine_all_texts.submit(extracted_texts)
     
-    # Generate dialogues from combined text
-    dialogues = generate_dialogues_task.submit(combined_text, model_key=model_key)
+    # Generate dialogues
+    dialogues_future = generate_dialogues_task.submit(combined_text, model_key=model_key)
     
-    # Save dialogues to file
-    result_path = save_dialogues.submit(dialogues)
+    # Save dialogues
+    save_future = save_dialogues.submit(dialogues_future)
     
-    parse_and_print_dialogues(dialogues.result())
+    # ✅ Wait for all tasks to finish before printing
+    dialogues = dialogues_future.result()
+    save_path = save_future.result()
     
-    return result_path
+    # Print dialogues in one go
+    parse_and_print_dialogues(dialogues)
+    
+    return save_path
 
 
 if __name__ == "__main__":
-    dialogue_flow()
+    app()
