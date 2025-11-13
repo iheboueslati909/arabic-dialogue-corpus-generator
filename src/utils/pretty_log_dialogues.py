@@ -11,7 +11,7 @@ from .config import (
 )
 
 # UTF-8 fix
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', line_buffering=True)
 
 def parse_and_print_dialogues(llm_response):
     try:

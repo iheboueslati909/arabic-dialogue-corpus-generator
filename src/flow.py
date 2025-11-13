@@ -13,10 +13,12 @@ from .utils.config import (
     COMBINE_TEXTS_RETRIES,
     GENERATE_DIALOGUES_RETRIES,
     GENERATE_DIALOGUES_RETRY_DELAY,
-    SAVE_DIALOGUES_RETRIES
+    SAVE_DIALOGUES_RETRIES,
+    DEFAULT_LLM_MODEL
 )
 from .utils.extractor import extract_text
 from .utils.generator import generate_dialogues
+from .utils.pretty_log_dialogues import parse_and_print_dialogues
 
 
 # -------------------- TASKS --------------------
@@ -35,16 +37,16 @@ def combine_all_texts(extracted_texts: List[str]) -> str:
 
 
 @task(retries=GENERATE_DIALOGUES_RETRIES, retry_delay_seconds=GENERATE_DIALOGUES_RETRY_DELAY, result_serializer="json")
-def generate_dialogues_task(combined_text: str) -> List[Dict[str, Any]]:
+def generate_dialogues_task(combined_text: str, model_key: str = DEFAULT_LLM_MODEL) -> List[Dict[str, Any]]:
     """Generate dialogues from combined text."""
     if not combined_text.strip():
         raise ValueError("Combined text is empty, cannot generate dialogues")
     
-    dialogues = generate_dialogues(combined_text)
+    dialogues = generate_dialogues(combined_text, model_key=model_key)
     
     if not dialogues:
         raise ValueError("No dialogues were generated")
-    
+        
     return dialogues
 
 
@@ -88,7 +90,7 @@ def validate_input_directory(input_dir: Path = INPUT_DIR) -> List[Path]:
 # -------------------- FLOW --------------------
 
 @flow(name="Arabic Dialogue Corpus Generation")
-def dialogue_flow(input_dir: Path = INPUT_DIR):
+def dialogue_flow(model_key: str = DEFAULT_LLM_MODEL, input_dir: Path = INPUT_DIR):
     """
     Main flow for Arabic Dialogue Corpus Generation.
     
@@ -100,7 +102,7 @@ def dialogue_flow(input_dir: Path = INPUT_DIR):
     """
     # Validate input and get file list
     file_paths = validate_input_directory(input_dir)
-    print(file_paths)
+    
     # Extract text from each document individually (parallel)
     extracted_texts = extract_single_document.map([str(p) for p in file_paths])
     
@@ -108,10 +110,12 @@ def dialogue_flow(input_dir: Path = INPUT_DIR):
     combined_text = combine_all_texts.submit(extracted_texts)
     
     # Generate dialogues from combined text
-    dialogues = generate_dialogues_task.submit(combined_text)
+    dialogues = generate_dialogues_task.submit(combined_text, model_key=model_key)
     
     # Save dialogues to file
     result_path = save_dialogues.submit(dialogues)
+    
+    parse_and_print_dialogues(dialogues.result())
     
     return result_path
 

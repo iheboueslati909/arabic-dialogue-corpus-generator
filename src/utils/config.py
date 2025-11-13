@@ -4,6 +4,8 @@ from pathlib import Path
 
 load_dotenv()
 
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
 LOG_INFO = "[INFO]"
 LOG_WARNING = "[WARNING]"
 LOG_ERROR = "[ERROR]"
@@ -26,8 +28,14 @@ Output as JSON:
 LLM_SECTION_SEPARATOR = "---"
 
 # LLM / API
-LLM_MODEL_NAME = "gemini-2.5-flash-lite"
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+LLM_MODELS = {
+    "flash_lite": "gemini-2.5-flash-lite",
+    "flash": "gemini-2.5-flash",
+}
+
+# Default model key
+DEFAULT_LLM_MODEL = "flash_lite"
+
 # Rate limiting
 CALLS_PER_MINUTE = 10
 PERIOD_SECONDS = 60

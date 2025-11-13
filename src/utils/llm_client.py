@@ -5,13 +5,14 @@ import google.generativeai as genai
 import google.api_core.exceptions as gerrors
 from .config import (
     GEMINI_API_KEY,
-    LLM_MODEL_NAME,
     LLM_RETRIES,
     BACKOFF_BASE,
     BACKOFF_CAP,
     LOG_INFO,
     LOG_WARNING,
-    LOG_ERROR
+    LOG_ERROR,
+    LLM_MODELS,
+    DEFAULT_LLM_MODEL
 )
 
 genai.configure(api_key=GEMINI_API_KEY)
@@ -24,18 +25,22 @@ def is_transient_error(e):
     """Check if error is transient and worth retrying."""
     return isinstance(e, (gerrors.ServiceUnavailable, gerrors.ResourceExhausted, gerrors.InternalServerError))
 
-def call_llm(prompt: str, retries: int = LLM_RETRIES):
+def call_llm(prompt: str, model_key: str = DEFAULT_LLM_MODEL, retries: int = LLM_RETRIES):
     """Call Gemini LLM with retries and exponential backoff."""
-    model = genai.GenerativeModel(LLM_MODEL_NAME)
+    model_name = LLM_MODELS.get(model_key)
+    if not model_name:
+        raise ValueError(f"Unknown LLM model key: {model_key}")
+    model = genai.GenerativeModel(model_name)
+
 
     for attempt in range(retries):
         try:
             start = time.time()
-            print(f"{LOG_INFO} Attempt {attempt+1}/{retries}: calling Gemini...")
+            print(f"{LOG_INFO} *** Attempt {attempt+1}/{retries}: calling {model_name} Model ... ***")
             response = model.generate_content(prompt)
             duration = time.time() - start
             text_len = len(response.text or "")
-            print(f"{LOG_INFO} Success in {duration:.2f}s, len={text_len}")
+            print(f"{LOG_INFO} *** Success in {duration:.2f}s, len={text_len} ***")
             return response.text
 
         except gerrors.GoogleAPICallError as e:
