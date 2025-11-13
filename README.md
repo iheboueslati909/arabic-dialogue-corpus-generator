@@ -45,8 +45,9 @@ pip install fastAPI
 ---
 
 ## 🔑 Environment Configuration
+create a .env file the put the following:
+GEMINI_API_KEY=you_api_key_here
 
-GEMINI_API_KEY=your_api_key_here
 ---
 
 ## ⚡ Prefect Setup
@@ -65,30 +66,24 @@ prefect config set PREFECT_API_URL=http://127.0.0.1:4200/api
 4. Verify your configuration
 prefect config view
 
+Once running, open the Prefect dashboard in the browser:
+http://127.0.0.1:4200/dashboard
 
-Once running, open the Prefect dashboard in your browser:
-👉 http://127.0.0.1:4200/dashboard
 ---
 
 ## 🧪 Running the Script
 
 Activate your virtual environment:
-
 .venv\Scripts\activate
 
-
 Then execute the main Prefect flow:
-
 python -m src.flow
 
-
 This process will:
-
 Extract text from all supported documents in your input directory.
-
 Use Gemini to generate dialogues.
+Save structured output locally/outputs.
 
-Save structured output locally /outputs.
 ---
 
 ## 🌍 Full-Stack Integration (Optional)
@@ -101,3 +96,50 @@ uvicorn app:app --reload --port 8000
 💻 Run the Next.js Frontend
 pnpm run dev
 
+---
+
+## ★ Workflow Orchestration: Evaluation & Recommendation
+When evaluating orchestration tools, I start by understanding the problem each tool was designed to solve:
+- Airflow: Built for scheduled batch ETL jobs running on external systems (Hadoop/Spark era)
+- Prefect: Designed for flexible, code-first orchestration with minimal operational overhead
+- Dagster: Architected for data platforms where asset lineage and software engineering practices are important
+
+For this assignment, Prefect is the clear choice because:
+- Zero infrastructure overhead: Prefect Cloud's free tier eliminates setup complexity, letting me focus on the AI pipeline rather than DevOps
+- Dynamic workflow generation: Since document count varies at runtime, Prefect's dynamic task creation (@task decorators) handles this naturally without the DAG constraints of Airflow
+- Developer velocity: Native Python with local-to-cloud deployment means faster iteration and testing
+- Built-in resilience: First-class retry logic and failure handling for LLM API calls (rate limits, timeouts)
+
+However, the "best" tool depends entirely on context. Below is my comparative analysis:
+
+| **Criterion** | **Prefect** | **Dagster** | **Airflow** |
+|---------------|-------------|-------------|-------------|
+| **Primary Use Case** | Task orchestration with event-driven flexibility | Data asset management & lineage tracking | Scheduled batch processing at enterprise scale |
+| **Best Fit For** | • Greenfield projects<br>• Small-to-medium teams<br>• Fast iteration cycles<br>• Variable/dynamic workflows | • Data platforms<br>• Teams prioritizing testability & software engineering practices<br>• Complex data lineage requirements | • Established enterprises<br>• 100+ workflows<br>• Heavy compliance/governance needs |
+| **Setup Complexity** | ✅ **Minimal** – Cloud-native, works immediately with free tier | ⚠️ **Moderate** – Requires upfront configuration and mental model shift to "assets" | ❌ **High** – Requires scheduler, webserver, database, worker infrastructure |
+| **Dynamic Workflows** | ✅ Tasks created at runtime (`submit()` pattern) | ⚠️ Partitions-based – Dynamic partitions allow flexibility but require pre-registration step | ❌ Static DAGs defined upfront (workarounds exist but are hacky) |
+| **Data Passing** | ✅ Native Python returns between tasks | ✅ Explicit I/O managers with type checking | ⚠️ XComs (limited to metadata, not data-heavy) |
+| **Local Development** | ✅ Excellent – run locally, deploy seamlessly | ✅ Strong testing framework built-in | ❌ Difficult – production-coupled, hard to replicate locally |
+| **Community & Ecosystem** | ⚠️ Growing but smaller than Airflow | ⚠️ Smallest community of the three | ✅ Massive – integrations with everything, extensive docs |
+| **Operational Overhead** | ✅ **Low** (cloud-managed) to ⚠️ **Medium** (self-hosted) | ⚠️ **Medium** – More hands-on infrastructure than Prefect | ❌ **High** – Significant DevOps investment required |
+| **Cost** | Free tier sufficient for most small projects; paid plans scale predictably | Core open-source; Cloud options available with hybrid/serverless models | Open-source but infrastructure have costs for managed options |
+| **Learning Curve** | ✅ **Gentle** – If you know Python, you know Prefect | ⚠️ **Steep** – Requires rethinking workflows as data assets | ⚠️ **Moderate-to-Steep** – Lots of configuration, gotchas around DAG execution |
+| **Avoid When** | • Large orgs requiring strict governance<br>• Need maximum control over infrastructure | • Simple use cases with tight deadlines<br>• Team not ready for asset-first thinking | • Heavy inter-task data communication<br>• Small team without DevOps capacity<br>• Need for dynamic task generation |
+
+---
+
+Decision Framework
+Choose Prefect if: 
+- You're a small team that needs to ship fast Workflow structure varies at runtime (like variable document counts)
+- You want cloud-first deployment without infrastructure management
+
+Choose Dagster if:
+- You're building a long-term data platform (not just pipelines)
+- Data lineage and quality are critical business requirements
+- Your team values strong typing, testability, and software engineering rigor
+- You have DBT models (Dagster's integration is best-in-class)
+
+Choose Airflow if:
+- You're at enterprise scale (large number of workflows)
+- Workflows are static, scheduled batch jobs
+- You have dedicated DevOps support
