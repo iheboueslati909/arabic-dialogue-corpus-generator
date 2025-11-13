@@ -1,47 +1,47 @@
 import os
 import time
-import requests
+import random
 import google.generativeai as genai
-from ratelimit import limits, sleep_and_retry
+import google.api_core.exceptions as gerrors
 
-# Configure Gemini API
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-
-# Gemini 2.5 Flash free tier: 10 requests per minute
 CALLS_PER_MINUTE = 10
-PERIOD = 60  # seconds
+PERIOD = 60
 
-@sleep_and_retry
-@limits(calls=CALLS_PER_MINUTE, period=PERIOD)
-def call_llm(prompt: str, retries: int = 3, backoff: float = 2.0):
-    """
-    Calls Gemini LLM with rate limiting (10 RPM) and retry on 429 errors.
-    """
-    print(f"Starting LLM call - Attempt 1/{retries}")
-    print(f"Prompt length: {len(prompt)} characters")
-    
+def backoff_delay(attempt, base=1, cap=30):
+    """Exponential backoff with jitter."""
+    return min(base * (2 ** attempt) + random.uniform(0, 1), cap)
+
+def is_transient_error(e):
+    """Check if error is transient and worth retrying."""
+    return isinstance(e, (gerrors.ServiceUnavailable, gerrors.ResourceExhausted, gerrors.InternalServerError))
+
+def call_llm(prompt: str, retries: int = 3):
+    """Call Gemini LLM with retries and exponential backoff."""
+    model = genai.GenerativeModel("gemini-2.5-flash-lite")
+
     for attempt in range(retries):
         try:
-            print(f"Calling Gemini API...")
-            model = genai.GenerativeModel("gemini-2.5-flash")
+            start = time.time()
+            print(f"[INFO] Attempt {attempt+1}/{retries}: calling Gemini...")
             response = model.generate_content(prompt)
-            print(f"API call successful - Response received")
+            duration = time.time() - start
+            text_len = len(response.text or "")
+            print(f"[INFO] Success in {duration:.2f}s, len={text_len}")
             return response.text
-        except requests.exceptions.HTTPError as e:
-            if e.response.status_code == 429:
-                wait_time = backoff ** attempt
-                print(f"Rate limit hit. Retrying in {wait_time:.1f}s... (Attempt {attempt + 1}/{retries})")
-                time.sleep(wait_time)
+
+        except gerrors.GoogleAPICallError as e:
+            if is_transient_error(e):
+                delay = backoff_delay(attempt)
+                print(f"[WARNING] Transient error: {type(e).__name__} — retrying in {delay:.1f}s")
+                time.sleep(delay)
+                continue
             else:
-                print(f"HTTP Error {e.response.status_code}: {e}")
+                print(f"[ERROR] Non-retryable error: {type(e).__name__} — {getattr(e, 'message', str(e))}")
                 raise
+
         except Exception as e:
-            print(f"Unexpected error: {e}")
-            if attempt == retries - 1:
-                raise
-            wait_time = backoff ** attempt
-            print(f"Retrying in {wait_time:.1f}s... (Attempt {attempt + 1}/{retries})")
-            time.sleep(wait_time)
-    
-    print("Failed to call LLM after all retries")
-    raise Exception("Failed to call LLM after retries.")
+            print(f"[ERROR] Unexpected error: {e}")
+            raise
+
+    raise RuntimeError("[ERROR] Failed after max retries")
