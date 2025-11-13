@@ -39,4 +39,4 @@ pip install ratelimit
 pip install google-generativeai
 pip install -U prefect prefect-cloud
 pip install python-dotenv
-
+pip install fastAPI
