@@ -1,7 +1,6 @@
 import os
 from markitdown import MarkItDown
-
-SUPPORTED_EXTENSIONS = {'.pdf', '.docx', '.ppt', '.pptx'}
+from .config import SUPPORTED_EXTENSIONS, LOG_INFO, LOG_WARNING, LOG_ERROR
 
 def extract_text(file_path: str) -> str:
     if not file_path or not isinstance(file_path, str):
@@ -17,22 +16,22 @@ def extract_text(file_path: str) -> str:
     ext = ext.lower()
 
     if ext not in SUPPORTED_EXTENSIONS:
-        print(f"[WARNING] Skipping unsupported file type: {file_path} (ext={ext})")
+        print(f"{LOG_WARNING} Skipping unsupported file type: {file_path} (ext={ext})")
         return ""
 
-    print(f"[INFO] Extracting text from: {file_path}")
+    print(f"{LOG_INFO} Extracting text from: {file_path}")
 
     try:
         md = MarkItDown()
         result = md.convert(file_path)
 
         if not result.text_content:
-            print(f"[WARNING] No text content extracted from: {file_path}")
+            print(f"{LOG_WARNING} No text content extracted from: {file_path}")
             return ""
 
-        print(f"[INFO] Extraction successful — {len(result.text_content)} characters from {file_path}")
+        print(f"{LOG_INFO} Extraction successful — {len(result.text_content)} characters from {file_path}")
         return result.text_content
 
     except Exception as e:
-        print(f"[ERROR] Failed to extract text from {file_path}: {e}")
+        print(f"{LOG_ERROR} Failed to extract text from {file_path}: {e}")
         raise RuntimeError(f"Text extraction failed for {file_path}") from e
