@@ -1,25 +1,38 @@
-from markitdown import MarkItDown
 import os
-import logging
-
-# Set up logger for this module
-logger = logging.getLogger(__name__)
+from markitdown import MarkItDown
 
 SUPPORTED_EXTENSIONS = {'.pdf', '.docx', '.ppt', '.pptx'}
 
 def extract_text(file_path: str) -> str:
-    # Get file extension (lowercase for case-insensitive comparison)
+    if not file_path or not isinstance(file_path, str):
+        raise ValueError("File path must be a non-empty string")
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    if not os.path.isfile(file_path):
+        raise ValueError(f"Path is not a file: {file_path}")
+
     _, ext = os.path.splitext(file_path)
     ext = ext.lower()
-    
-    # Skip unsupported files
+
     if ext not in SUPPORTED_EXTENSIONS:
-        logger.warning(
-            f"Skipping unsupported file type: {file_path} (extension: {ext})"
-        )
-        return ""  # Return empty string instead of raising
-    
-    # Proceed with extraction
-    md = MarkItDown()
-    result = md.convert(file_path)
-    return result.text_content
+        print(f"[WARNING] Skipping unsupported file type: {file_path} (ext={ext})")
+        return ""
+
+    print(f"[INFO] Extracting text from: {file_path}")
+
+    try:
+        md = MarkItDown()
+        result = md.convert(file_path)
+
+        if not result.text_content:
+            print(f"[WARNING] No text content extracted from: {file_path}")
+            return ""
+
+        print(f"[INFO] Extraction successful — {len(result.text_content)} characters from {file_path}")
+        return result.text_content
+
+    except Exception as e:
+        print(f"[ERROR] Failed to extract text from {file_path}: {e}")
+        raise RuntimeError(f"Text extraction failed for {file_path}") from e
