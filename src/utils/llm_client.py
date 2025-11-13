@@ -18,7 +18,7 @@ def is_transient_error(e):
 
 def call_llm(prompt: str, retries: int = 3):
     """Call Gemini LLM with retries and exponential backoff."""
-    model = genai.GenerativeModel("gemini-2.5-flash-lite")
+    model = genai.GenerativeModel("gemini-2.5-flash")
 
     for attempt in range(retries):
         try:
