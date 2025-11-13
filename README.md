@@ -9,7 +9,7 @@ A lightweight workflow that extracts text from documents and generates structure
 The **Dialogue Generator** automates:
 
 1. **Extracting content** from uploaded documents (`.docx`, `.pdf`, `.pptx`)
-2. **Generating dialogues** using `gemini-2.5-flash`
+2. **Generating dialogues** using `gemini-2.5-flash-lite`
 3. **Enforcing rate limits** (Gemini Free Tier)
 4. **Orchestrating tasks** via **Prefect**
 5. *(Optional)* Serving results via a FastAPI backend and Next.js frontend
@@ -35,7 +35,7 @@ NEXT.js: https://github.com/iheboueslati909/aralects-assessment-next-js
 Install required dependencies:
 
 ```bash
-pip install markitdown[PPT,DOCX,PDF]
+pip install markitdown[PPT,DOCX,PDF,PPTX]
 pip install ratelimit
 pip install google-generativeai
 pip install -U prefect prefect-cloud
@@ -45,56 +45,56 @@ pip install fastAPI
 ---
 
 ## 🔑 Environment Configuration
-create a .env file the put the following:
-GEMINI_API_KEY=you_api_key_here
+- create a .env file the put the following:
+     
+     GEMINI_API_KEY=you_api_key_here
+
+ - `config.py` centralizes all hardcoded values and constants
 
 ---
 
 ## ⚡ Prefect Setup
 
-To run Prefect locally:
+To setup Prefect locally ( assuming you installed the dependencies above ), run the following commands:
 
-1. Start the local Prefect server
-prefect server start
 
-2. Create a local profile
-prefect profile create local
-
-3. Configure the Prefect API URL
-prefect config set PREFECT_API_URL=http://127.0.0.1:4200/api
-
-4. Verify your configuration
-prefect config view
+1. Create a local profile:
+`prefect profile create local`
+2. Configure the Prefect API URL:
+`prefect config set PREFECT_API_URL=http://127.0.0.1:4200/api`
+3. Verify your configuration:
+`prefect config view`
+4.  Start the local Prefect server:
+`prefect server start`
 
 Once running, open the Prefect dashboard in the browser:
 http://127.0.0.1:4200/dashboard
 
 ---
 
-## 🧪 Running the Script
+## 🧪 Running the project
 
-Activate your virtual environment:
-.venv\Scripts\activate
-
-Then execute the main Prefect flow:
-python -m src.flow
+1. Activate your virtual environment:
+`.venv\Scripts\activate`
+2. Execute the main Prefect flow:
+`python -m src.flow`
 
 This process will:
-Extract text from all supported documents in your input directory.
-Use Gemini to generate dialogues.
-Save structured output locally/outputs.
+1. Extract text from all supported documents in the input directory.
+2. Use Gemini to generate dialogues.
+3. Log & save structured output locally in `data/outputs` .
 
 ---
 
 ## 🌍 Full-Stack Integration (Optional)
 
-For an end-to-end setup, you can connect your Prefect flow with the backend and frontend layers.
+For an end-to-end setup, you can connect your Prefect flow with the backend and frontend layers. This project comes with FastAPI integration too ( app.py located at the root ).
 
-🖥️ Run the FastAPI Backend
-uvicorn app:app --reload --port 8000
+🖥️ Run the FastAPI Backend:
+`uvicorn app:app --reload --port 8000`
 
-💻 Run the Next.js Frontend
-pnpm run dev
+💻 Run the Next.js Frontend:
+`pnpm run dev`
 
 ---
 
