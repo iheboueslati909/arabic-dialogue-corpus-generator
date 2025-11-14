@@ -9,6 +9,8 @@ from .config import (
     SPEAKER_A_ICON,
     SPEAKER_B_ICON
 )
+import arabic_reshaper
+from bidi.algorithm import get_display
 
 # UTF-8 fix
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', line_buffering=True)
@@ -29,13 +31,16 @@ def print_dialogues(data):
         topic = conversation["topic"]
         dialogue = conversation["dialogue"]
 
+        # Print topic normally, may include Arabic
+        reshaped_topic = get_display(arabic_reshaper.reshape(topic))
         print(f"\n{DIALOGUE_TOPIC_LINE}")
-        print(f"{DIALOGUE_TOPIC_ICON} Conversation {i}: {topic}")
+        print(f"{DIALOGUE_TOPIC_ICON} Conversation {i}: {reshaped_topic}")
         print(f"{DIALOGUE_TOPIC_LINE}")
 
         for exchange in dialogue:
             for speaker, text in exchange.items():
                 icon = SPEAKER_A_ICON if speaker == "A" else SPEAKER_B_ICON
-                print(f"{icon} {speaker}: {text}")
+                reshaped_text = get_display(arabic_reshaper.reshape(text))
+                print(f"{icon} {speaker}: {reshaped_text}")
 
         print()
