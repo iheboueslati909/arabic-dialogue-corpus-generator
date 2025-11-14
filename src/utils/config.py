@@ -36,9 +36,6 @@ LLM_MODELS = {
 # Default model key
 DEFAULT_LLM_MODEL = "flash_lite"
 
-# Rate limiting
-CALLS_PER_MINUTE = 10
-PERIOD_SECONDS = 60
 # Retry / Backoff
 LLM_RETRIES = 3
 BACKOFF_BASE = 1
