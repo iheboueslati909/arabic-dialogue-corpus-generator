@@ -70,10 +70,17 @@ To setup Prefect locally ( assuming you installed the dependencies above ), run 
 Once running, open the Prefect dashboard in the browser:
 http://127.0.0.1:4200/dashboard
 
+To setup Prefect cloud
+1. Create a local profile:
+`prefect cloud login`
+1. Switch to other profile:
+`prefect profile use <cloud-profile>`
+
 ---
 
 ## 🧪 Running the project
 
+0. Run prefect locally or use a cloud profile.
 1. Activate your virtual environment:
 `.venv\Scripts\activate`
 2. Execute the main Prefect flow:
