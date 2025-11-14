@@ -1,6 +1,6 @@
 # 🗣️ Dialogue Generator
 
-A lightweight workflow that extracts text from documents and generates structured dialogues using **Gemini 2.5 Flash**, orchestrated with **Prefect**, and optionally integrated with **FastAPI + Next.js** for a complete full-stack experience.
+A lightweight workflow that extracts text from documents and generates structured dialogues using **Gemini 2.5 Flash** / **Gemini 2.5 Flash-lite**, orchestrated with **Prefect**, and optionally integrated with **FastAPI + Next.js** for a complete full-stack experience.
 
 ---
 
@@ -9,7 +9,7 @@ A lightweight workflow that extracts text from documents and generates structure
 The **Dialogue Generator** automates:
 
 1. **Extracting content** from uploaded documents (`.docx`, `.pdf`, `.pptx`)
-2. **Generating dialogues** using `gemini-2.5-flash-lite`
+2. **Generating dialogues** using `gemini-2.5-flash-lite` / `gemini-2.5-flash`
 3. **Orchestrating tasks** via **Prefect**
 4. *(Optional)* Serving results via a FastAPI backend and Next.js frontend
 NEXT.js: https://github.com/iheboueslati909/aralects-assessment-next-js
@@ -18,10 +18,8 @@ NEXT.js: https://github.com/iheboueslati909/aralects-assessment-next-js
 ## ⚙️ Features
 
 - ✅ Supports **DOCX**, **PDF**, **PPT** and **PPTX** files  
-- ⚡ Uses **Gemini 2.5 Flash** for dialogue generation  
-- 🔒 Built-in rate limiter for gemini-2.5-flash Free Tier
 - ☁️ Integrated with **Prefect 3** for local orchestration and UI dashboard  
-- 🚀 The ability to switch between gemini 2.5-flash and gemini 2.5-flash-lite
+- 🚀 The ability to switch between gemini 2.5-flash and gemini 2.5-flash-lite for dialogue generation  
 - 🌐 Optional **FastAPI + Next.js** integration for full-stack use  
 
 
@@ -110,7 +108,7 @@ For this assignment, Prefect is the clear choice because:
 - Zero infrastructure overhead: Prefect Cloud's free tier eliminates setup complexity, letting me focus on the AI pipeline rather than DevOps
 - Dynamic workflow generation: Since document count varies at runtime, Prefect's dynamic task creation (@task decorators) handles this naturally without the DAG constraints of Airflow
 - Developer velocity: Native Python with local-to-cloud deployment means faster iteration and testing
-- Built-in resilience: First-class retry logic and failure handling for LLM API calls (rate limits, timeouts)
+- Built-in resilience: First-class retry logic and failure handling for LLM API calls
 
 However, the "best" tool depends entirely on context. Below is my comparative analysis:
 
