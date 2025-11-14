@@ -22,10 +22,12 @@ NEXT.js: https://github.com/iheboueslati909/aralects-assessment-next-js
 - ⚡ Uses **Gemini 2.5 Flash** for dialogue generation  
 - 🔒 Built-in rate limiter for gemini-2.5-flash Free Tier
 - ☁️ Integrated with **Prefect 3** for local orchestration and UI dashboard  
+- 🚀 The ability to switch between gemini 2.5-flash and gemini 2.5-flash-lite
 - 🌐 Optional **FastAPI + Next.js** integration for full-stack use  
 
+
 ---
-![ezcv logo](https://raw.githubusercontent.com/iheboueslati909/arabic-dialogue-corpus-generator/refs/heads/main/ss1.png)
+![ezcv logo](https://raw.githubusercontent.com/iheboueslati909/arabic-dialogue-corpus-generator/refs/heads/main/ss3.png)
 ![ezcv logo](https://raw.githubusercontent.com/iheboueslati909/arabic-dialogue-corpus-generator/refs/heads/main/ss2.png)
 
 ---
@@ -41,6 +43,8 @@ pip install google-generativeai
 pip install -U prefect prefect-cloud
 pip install python-dotenv
 pip install fastAPI
+pip install typer
+pip install arabic-reshaper python-bidi
 ```
 ---
 
@@ -77,12 +81,12 @@ http://127.0.0.1:4200/dashboard
 1. Activate your virtual environment:
 `.venv\Scripts\activate`
 2. Execute the main Prefect flow:
-`python -m src.flow`
+`python -m src.flow --model flash` or `python -m src.flow --model flash-lite`
 
 This process will:
 1. Extract text from all supported documents in the input directory.
 2. Use Gemini to generate dialogues.
-3. Log & save structured output locally in `data/outputs` .
+3. Log ( using arabic-reshaper ) & save json output locally in `data/outputs` .
 
 ---
 
