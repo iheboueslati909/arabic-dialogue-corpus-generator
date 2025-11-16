@@ -55,7 +55,7 @@ pip install arabic-reshaper python-bidi
 
 ## ⚡ Prefect Setup
 
-To setup Prefect locally ( assuming you installed the dependencies above ), run the following commands:
+To setup Prefect locally ( assuming you installed the dependencies above ), run the following commands in project's root:
 
 
 1. Create a local profile:
@@ -81,9 +81,11 @@ To setup Prefect cloud
 ## 🧪 Running the project
 
 0. Run prefect locally or use a cloud profile.
-1. Activate your virtual environment:
+1. Setup up then activate your virtual environment:
+`python -m venv venv`
+then
 `.venv\Scripts\activate`
-2. Execute the main Prefect flow:
+3. Execute the main Prefect flow:
 `python -m src.flow --model flash` or `python -m src.flow --model flash-lite`
 
 This process will:
